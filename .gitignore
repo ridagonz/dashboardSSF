@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+.vercel/
+coverage/
+etl/pylibs/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+.claude/
+.env*
+!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

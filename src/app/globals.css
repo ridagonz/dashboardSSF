@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --fuente-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+html,
+body {
+  background-color: #fbfaf8;
+  color: #1c1917;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .tarjeta {
+    @apply rounded-xl border border-arena-200 bg-white shadow-tarjeta;
+  }
+  .tarjeta-titulo {
+    @apply text-[13px] font-semibold uppercase tracking-wide text-tinta-500;
+  }
+  .campo {
+    @apply rounded-lg border border-arena-300 bg-white px-3 py-2 text-sm text-tinta-900
+           outline-none transition focus:border-vino-700 focus:ring-2 focus:ring-vino-200;
+  }
+  .boton {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm
+           font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .boton-primario {
+    @apply boton bg-vino-700 text-white hover:bg-vino-800;
+  }
+  .boton-secundario {
+    @apply boton border border-arena-300 bg-white text-tinta-700 hover:border-vino-300 hover:text-vino-700;
+  }
+}
+
+/* La barra de scroll de las tablas largas, discreta. */
+.scroll-fino::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.scroll-fino::-webkit-scrollbar-thumb {
+  background-color: #d6ccbc;
+  border-radius: 999px;
+}
+.scroll-fino::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Durante la captura del PDF se congelan animaciones y sombras para que
+   html2canvas no produzca lienzos en blanco. */
+.exportando * {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media print {
+  .sin-imprimir {
+    display: none !important;
+  }
+  body {
+    background: #ffffff;
+  }
+}
