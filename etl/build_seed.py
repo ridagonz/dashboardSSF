@@ -104,6 +104,15 @@ def leer_csv(nombre):
         return list(csv.DictReader(fh))
 
 
+def leer_json(nombre):
+    ruta = os.path.join(SRC, nombre)
+    if not os.path.exists(ruta):
+        print(f"  ! falta {nombre}", file=sys.stderr)
+        return {}
+    with open(ruta, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
 # --------------------------------------------------------------------------
 # X (Twitter)
 # --------------------------------------------------------------------------
@@ -411,36 +420,84 @@ def build_tiktok():
 
 
 # --------------------------------------------------------------------------
-# Instagram — SIN DATOS.
-#
-# Los screenshots entregados el 06/08/2026 no corresponden a Instagram:
-#   * "Metricas clave / Recomp. estimadas"  -> TikTok Analytics
-#     (visualizaciones, visitas de perfil, me gusta, comentarios y compartidos
-#      cuadran exactos con tiktok_overview.csv)
-#   * "Todas las visualizaciones / Reels / Publicaciones / Historias" -> Facebook
-#     (9 de 10 publicaciones top coinciden exactas con facebook_content.csv)
-#
-# El modulo queda listo y se completa desde el panel "Actualizar datos"
-# del tablero, pestana Instagram, transcribiendo el screenshot real.
+# Instagram — captura manual de los insights de cada publicación.
 # --------------------------------------------------------------------------
 def build_instagram():
+    fuente = leer_json("instagram_julio_2026.json")
+    posts = fuente.get("publicaciones", [])
+    if not posts:
+        return {
+            "modo": "manual", "sinDatos": True,
+            "periodo": {"desde": None, "hasta": None},
+            "perfil": {"usuario": "supersubsidio", "seguidores": 0,
+                       "meGustaAcumulados": 0, "siguiendo": 0},
+            "resumen": {
+                "visualizaciones": 0, "visualizacionesVar": 0,
+                "alcance": 0, "alcanceVar": 0,
+                "interacciones": 0, "interaccionesVar": 0,
+                "visitasPerfil": 0, "visitasPerfilVar": 0,
+                "meGusta": 0, "comentarios": 0, "compartidos": 0,
+                "guardados": 0, "seguidoresNuevos": 0,
+            },
+            "porFormato": [], "origenAudiencia": [],
+            "publicaciones": [], "historias": [],
+        }
+
+    campos_suma = ("visualizaciones", "espectadores", "interacciones", "meGusta",
+                   "comentarios", "compartidos", "guardados", "cuentasInteractuaron")
+    totales = {campo: sum(i(p.get(campo)) for p in posts) for campo in campos_suma}
+
+    formatos = defaultdict(lambda: {"publicaciones": 0, "visualizaciones": 0})
+    seguidores_ponderados = 0.0
+    for p in posts:
+        formato = formatos[p.get("tipo") or "Otro"]
+        formato["publicaciones"] += 1
+        formato["visualizaciones"] += i(p.get("visualizaciones"))
+        seguidores_ponderados += (
+            i(p.get("visualizaciones")) * num(p.get("audienciaSeguidoresPct")) / 100
+        )
+
+    visualizaciones = totales["visualizaciones"]
+    pct_seguidores = round(
+        seguidores_ponderados / visualizaciones * 100, 1
+    ) if visualizaciones else 0
+    por_formato = [
+        {
+            "nombre": nombre,
+            "publicaciones": valores["publicaciones"],
+            "porcentaje": round(valores["visualizaciones"] / visualizaciones * 100, 1),
+            "visualizaciones": valores["visualizaciones"],
+        }
+        for nombre, valores in sorted(
+            formatos.items(), key=lambda x: -x[1]["visualizaciones"]
+        )
+    ]
+
     return {
         "modo": "manual",
-        "sinDatos": True,
-        "periodo": {"desde": None, "hasta": None},
+        "sinDatos": False,
+        "periodo": fuente.get("periodo", {"desde": "2026-07-01", "hasta": "2026-07-31"}),
         "perfil": {"usuario": "supersubsidio", "seguidores": 0,
                    "meGustaAcumulados": 0, "siguiendo": 0},
         "resumen": {
-            "visualizaciones": 0, "visualizacionesVar": 0,
-            "alcance": 0, "alcanceVar": 0,
-            "interacciones": 0, "interaccionesVar": 0,
+            "visualizaciones": visualizaciones, "visualizacionesVar": 0,
+            "alcance": totales["espectadores"], "alcanceVar": 0,
+            "interacciones": totales["interacciones"], "interaccionesVar": 0,
             "visitasPerfil": 0, "visitasPerfilVar": 0,
-            "meGusta": 0, "comentarios": 0, "compartidos": 0, "guardados": 0,
+            "meGusta": totales["meGusta"],
+            "comentarios": totales["comentarios"],
+            "compartidos": totales["compartidos"],
+            "guardados": totales["guardados"],
             "seguidoresNuevos": 0,
         },
-        "porFormato": [],
-        "origenAudiencia": [],
-        "publicaciones": [],
+        "porFormato": por_formato,
+        "origenAudiencia": [
+            {"nombre": "Seguidores", "porcentaje": pct_seguidores},
+            {"nombre": "No seguidores", "porcentaje": round(100 - pct_seguidores, 1)},
+        ],
+        "publicaciones": sorted(
+            posts, key=lambda p: (-i(p.get("visualizaciones")), p.get("fecha", ""))
+        ),
         "historias": [],
     }
 

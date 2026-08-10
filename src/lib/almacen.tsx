@@ -13,7 +13,9 @@ import type { BaseDatos, RangoFechas, VistaId } from "./tipos";
 import { rangoDisponible } from "./datos";
 import type { Resultado } from "./importar";
 
-const CLAVE = "tablero-ssf-datos-v2";
+// Se incrementa al ampliar el modelo manual de Instagram para evitar que una
+// copia local antigua oculte los datos de julio incluidos en la semilla.
+const CLAVE = "tablero-ssf-datos-v3";
 const BASE = semilla as unknown as BaseDatos;
 
 interface Almacen {

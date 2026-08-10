@@ -108,7 +108,12 @@ export interface DatosInstagram {
     guardados: number;
     seguidoresNuevos: number;
   };
-  porFormato: { nombre: string; porcentaje: number; visualizaciones: number }[];
+  porFormato: {
+    nombre: string;
+    porcentaje: number;
+    visualizaciones: number;
+    publicaciones?: number;
+  }[];
   origenAudiencia: { nombre: string; porcentaje: number }[];
   publicaciones: {
     fecha: string;
@@ -116,6 +121,14 @@ export interface DatosInstagram {
     titulo: string;
     tipo: string;
     visualizaciones: number;
+    espectadores?: number;
+    interacciones?: number;
+    meGusta?: number;
+    comentarios?: number;
+    compartidos?: number;
+    guardados?: number;
+    cuentasInteractuaron?: number;
+    audienciaSeguidoresPct?: number;
   }[];
   historias: { fecha: string; hora: string; titulo: string; visualizaciones: number }[];
 }
