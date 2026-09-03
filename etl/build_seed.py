@@ -117,12 +117,13 @@ def leer_json(nombre):
 # X (Twitter)
 # --------------------------------------------------------------------------
 def build_x():
-    daily = []
-    for r in leer_csv("x_overview.csv"):
+    daily_map = {}
+    for nombre in ("x_overview.csv", "x_overview_agosto.csv"):
+      for r in leer_csv(nombre):
         f = parse_x(r.get("Date"))
         if not f:
             continue
-        daily.append({
+        daily_map[f] = {
             "fecha": f,
             "impresiones": i(r.get("Impresiones")),
             "interacciones": i(r.get("Interacciones")),
@@ -135,15 +136,16 @@ def build_x():
             "seguidoresBajas": i(r.get("Dejar de seguir")),
             "visitasPerfil": i(r.get("Visitas del perfil")),
             "publicaciones": i(r.get("Crear post")),
-        })
-    daily.sort(key=lambda x: x["fecha"])
+        }
+    daily = sorted(daily_map.values(), key=lambda x: x["fecha"])
 
-    posts = []
-    for r in leer_csv("x_content.csv"):
+    posts_map = {}
+    for nombre in ("x_content.csv", "x_content_agosto.csv"):
+      for r in leer_csv(nombre):
         f = parse_x(r.get("Fecha"))
         if not f:
             continue
-        posts.append({
+        post = {
             "fecha": f,
             "texto": (r.get("Texto del post") or "").strip(),
             "enlace": r.get("Postear enlace") or "",
@@ -153,7 +155,9 @@ def build_x():
             "comentarios": i(r.get("Respuestas")),
             "compartidos": i(r.get("Reposts")),
             "clicsEnlace": i(r.get("Clics en URL")),
-        })
+        }
+        posts_map[post["enlace"] or f'{f}|{post["texto"][:60]}'] = post
+    posts = list(posts_map.values())
     posts.sort(key=lambda x: -x["impresiones"])
     return {"daily": daily, "posts": posts}
 
@@ -244,50 +248,54 @@ def demografia(filas, etiqueta):
 
 
 def build_linkedin():
-    hc = hojas("linkedin_content.xls")
-    hf = hojas("linkedin_followers.xls")
+    hcs = [hojas(nombre) for nombre in ("linkedin_content.xls", "linkedin_content_agosto.xls")]
+    hfs = [hojas(nombre) for nombre in ("linkedin_followers.xls", "linkedin_followers_agosto.xls")]
+    hv = hojas("linkedin_visitors_agosto.xls")
 
     daily_map = {}
-    for r in tabla(hc.get("Indicadores", []), 1):
-        f = parse_us(r.get("Fecha"))
-        if not f:
-            continue
-        daily_map[f] = {
-            "fecha": f,
-            "impresiones": i(r.get("Impresiones (totales)")),
-            "alcance": i(r.get("Impresiones únicas (orgánicas)")),
-            "clics": i(r.get("Clics (totales)")),
-            "meGusta": i(r.get("Reacciones (total)")),
-            "comentarios": i(r.get("Comentarios (totales)")),
-            "compartidos": i(r.get("Veces compartido (total)")),
-            "tasaInteraccion": round(num(r.get("Tasa de interacción (total)")) * 100, 3),
-        }
+    for hc in hcs:
+        for r in tabla(hc.get("Indicadores", []), 1):
+            f = parse_us(r.get("Fecha"))
+            if not f:
+                continue
+            daily_map[f] = {
+                "fecha": f,
+                "impresiones": i(r.get("Impresiones (totales)")),
+                "alcance": i(r.get("Impresiones únicas (orgánicas)")),
+                "clics": i(r.get("Clics (totales)")),
+                "meGusta": i(r.get("Reacciones (total)")),
+                "comentarios": i(r.get("Comentarios (totales)")),
+                "compartidos": i(r.get("Veces compartido (total)")),
+                "tasaInteraccion": round(num(r.get("Tasa de interacción (total)")) * 100, 3),
+            }
     for d in daily_map.values():
         d["interacciones"] = d["meGusta"] + d["comentarios"] + d["compartidos"] + d["clics"]
 
     # Seguidores diarios desde el segundo libro.
-    for r in tabla(hf.get("Nuevos seguidores", []), 0):
-        f = parse_us(r.get("Fecha"))
-        if not f:
-            continue
-        d = daily_map.setdefault(f, {"fecha": f, "impresiones": 0, "alcance": 0,
-                                     "clics": 0, "meGusta": 0, "comentarios": 0,
-                                     "compartidos": 0, "tasaInteraccion": 0,
-                                     "interacciones": 0})
-        d["seguidoresNuevos"] = i(r.get("Total de seguidores"))
-        d["seguidoresOrganicos"] = i(r.get("Seguidores generales"))
-        d["seguidoresPatrocinados"] = i(r.get("Seguidores patrocinados"))
+    for hf in hfs:
+        for r in tabla(hf.get("Nuevos seguidores", []), 0):
+            f = parse_us(r.get("Fecha"))
+            if not f:
+                continue
+            d = daily_map.setdefault(f, {"fecha": f, "impresiones": 0, "alcance": 0,
+                                         "clics": 0, "meGusta": 0, "comentarios": 0,
+                                         "compartidos": 0, "tasaInteraccion": 0,
+                                         "interacciones": 0})
+            d["seguidoresNuevos"] = i(r.get("Total de seguidores"))
+            d["seguidoresOrganicos"] = i(r.get("Seguidores generales"))
+            d["seguidoresPatrocinados"] = i(r.get("Seguidores patrocinados"))
     for d in daily_map.values():
         d.setdefault("seguidoresNuevos", 0)
 
     daily = sorted(daily_map.values(), key=lambda x: x["fecha"])
 
-    posts = []
-    for r in tabla(hc.get("Todas las publicaciones", []), 1):
+    posts_map = {}
+    for hc in hcs:
+      for r in tabla(hc.get("Todas las publicaciones", []), 1):
         f = parse_us(r.get("Fecha de creación"))
         if not f:
             continue
-        posts.append({
+        post = {
             "fecha": f,
             "texto": str(r.get("Título de la publicación") or "").strip(),
             "enlace": str(r.get("Enlace de la publicación") or ""),
@@ -299,11 +307,18 @@ def build_linkedin():
             "comentarios": i(r.get("Comentarios")),
             "compartidos": i(r.get("Veces compartido")),
             "tasaInteraccion": round(num(r.get("Tasa de interacción")) * 100, 2),
-        })
+        }
+        posts_map[post["enlace"] or f'{f}|{post["texto"][:60]}'] = post
+    posts = list(posts_map.values())
     for p in posts:
         p["interacciones"] = p["meGusta"] + p["comentarios"] + p["compartidos"] + p["clics"]
     posts.sort(key=lambda x: -x["impresiones"])
 
+    hf = hfs[-1]
+    for r in tabla(hv.get("Datos de visitantes", []), 0):
+        f = parse_us(r.get("Fecha"))
+        if f in daily_map:
+            daily_map[f]["visitasPerfil"] = i(r.get("Visualizaciones de la página general (total)"))
     total_seguidores = sum(x["valor"] for x in demografia(hf.get("Ubicación", []), "Ubicación"))
 
     return {
@@ -503,13 +518,13 @@ def build_instagram():
 
 
 # --------------------------------------------------------------------------
-# SEO — Semrush Monthly (www.ssf.gov.co), julio 2026
+# SEO — Semrush Monthly (www.ssf.gov.co), informe generado en septiembre 2026
 # --------------------------------------------------------------------------
 def build_seo():
     return {
         "modo": "manual",
         "dominio": "www.ssf.gov.co",
-        "periodo": {"etiqueta": "Julio 2026", "generado": "2026-08-06"},
+        "periodo": {"etiqueta": "Julio 2026", "generado": "2026-09-02"},
         "trafico": {
             "visitas": 33600, "visitasVar": 12.76,
             "visitantesUnicos": 26300, "visitantesUnicosVar": 23.93,
@@ -534,10 +549,10 @@ def build_seo():
         ],
         "marca": {"conMarca": 0.0, "sinMarca": 100.0},
         "backlinks": {
-            "total": 20700, "dominiosReferencia": 752, "ipsReferencia": 1000,
+            "total": 21200, "dominiosReferencia": 846, "ipsReferencia": 1000,
             "tipos": [
-                {"nombre": "Imagen", "valor": 13300, "porcentaje": 71.57},
-                {"nombre": "Texto", "valor": 5300, "porcentaje": 28.43},
+                {"nombre": "Imagen", "valor": 13600, "porcentaje": 70.95},
+                {"nombre": "Texto", "valor": 5600, "porcentaje": 29.05},
                 {"nombre": "Formulario", "valor": 0, "porcentaje": 0},
                 {"nombre": "Marco", "valor": 0, "porcentaje": 0},
             ],

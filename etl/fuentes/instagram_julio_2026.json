@@ -1,6 +1,38 @@
 {
-  "periodo": { "desde": "2026-07-01", "hasta": "2026-07-31" },
+  "periodo": { "desde": "2026-08-01", "hasta": "2026-08-31" },
   "publicaciones": [
+    {
+      "fecha": "2026-08-12", "hora": "12:44", "titulo": "Solidaridad con Javier Gómez Gutiérrez", "tipo": "Foto",
+      "visualizaciones": 20216, "espectadores": 6895, "interacciones": 175, "meGusta": 143, "comentarios": 0, "compartidos": 27, "guardados": 5, "cuentasInteractuaron": 163, "audienciaSeguidoresPct": 91.0
+    },
+    {
+      "fecha": "2026-08-13", "hora": "11:45", "titulo": "Nueva versión del Observatorio del Subsidio Familiar", "tipo": "Reel",
+      "visualizaciones": 1927, "espectadores": 785, "interacciones": 17, "meGusta": 16, "comentarios": 0, "compartidos": 1, "guardados": 0, "cuentasInteractuaron": 18, "audienciaSeguidoresPct": 46.8
+    },
+    {
+      "fecha": "2026-08-15", "hora": "06:46", "titulo": "Ayudas para las familias colombianas", "tipo": "Reel",
+      "visualizaciones": 3601, "espectadores": 1709, "interacciones": 102, "meGusta": 85, "comentarios": 1, "compartidos": 4, "guardados": 2, "cuentasInteractuaron": 86, "audienciaSeguidoresPct": 51.5
+    },
+    {
+      "fecha": "2026-08-18", "hora": "10:00", "titulo": "La Supersubsidio", "tipo": "Reel",
+      "visualizaciones": 2458, "espectadores": 1008, "interacciones": 25, "meGusta": 19, "comentarios": 0, "compartidos": 4, "guardados": 0, "cuentasInteractuaron": 21, "audienciaSeguidoresPct": 48.8
+    },
+    {
+      "fecha": "2026-08-20", "hora": "10:06", "titulo": "Bienvenida a la nueva Superintendente del Subsidio Familiar", "tipo": "Foto",
+      "visualizaciones": 120628, "espectadores": 22546, "interacciones": 975, "meGusta": 839, "comentarios": 39, "compartidos": 72, "guardados": 25, "cuentasInteractuaron": 918, "audienciaSeguidoresPct": 49.3
+    },
+    {
+      "fecha": "2026-08-20", "hora": "15:46", "titulo": "Encuentro para seguir trabajando por las familias colombianas", "tipo": "Foto",
+      "visualizaciones": 20637, "espectadores": 6602, "interacciones": 242, "meGusta": 219, "comentarios": 5, "compartidos": 4, "guardados": 5, "cuentasInteractuaron": 234, "audienciaSeguidoresPct": 81.0
+    },
+    {
+      "fecha": "2026-08-21", "hora": "17:23", "titulo": "Fabián Vicente Mayor Olaya, agente especial de intervención", "tipo": "Foto",
+      "visualizaciones": 18388, "espectadores": 6023, "interacciones": 191, "meGusta": 114, "comentarios": 2, "compartidos": 71, "guardados": 4, "cuentasInteractuaron": 161, "audienciaSeguidoresPct": 69.3
+    },
+    {
+      "fecha": "2026-08-25", "hora": "08:43", "titulo": "Protegemos los recursos del Sistema del Subsidio Familiar", "tipo": "Reel",
+      "visualizaciones": 21443, "espectadores": 6852, "interacciones": 390, "meGusta": 254, "comentarios": 21, "compartidos": 78, "guardados": 21, "cuentasInteractuaron": 349, "audienciaSeguidoresPct": 53.6
+    },
     {
       "fecha": "2026-07-31", "hora": "08:01", "titulo": "Vivienda digna para mujeres rurales", "tipo": "Reel",
       "visualizaciones": 1990, "espectadores": 1157, "interacciones": 51, "meGusta": 42, "comentarios": 0, "compartidos": 1, "guardados": 1, "cuentasInteractuaron": 44, "audienciaSeguidoresPct": 49.6
